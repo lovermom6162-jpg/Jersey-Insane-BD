@@ -324,22 +324,57 @@
             }
         }
 
-        function checkout() {
-            if (cart.length === 0) {
-                alert("Please add some jerseys to your cart first!");
-                return;
-            }
-            const name = prompt("Enter your Full Name:");
-            const phone = prompt("Enter your Phone Number:");
-            const address = prompt("Enter your Delivery Address:");
-            
-            if (name && phone && address) {
-                alert(`Thank you ${name}! Your order has been placed. We will call you at ${phone} soon.`);
-                cart = [];
-                updateCartUI();
-                toggleCart();
-            }
-        }
+        // এখানে নিজের WhatsApp নম্বর দিন (880 দিয়ে শুরু, কোনো + বা স্পেস দেবেন না)
+const WHATSAPP_NUMBER = "8801XXXXXXXXX";
+
+function checkout() {
+    if (cart.length === 0) {
+        alert("Please add some jerseys to your cart first!");
+        return;
+    }
+
+    const name = prompt("আপনার পুরো নাম লিখুন (Full Name):");
+    if (!name) return;
+
+    const phone = prompt("আপনার মোবাইল/WhatsApp নম্বর লিখুন (Phone Number):");
+    if (!phone) return;
+
+    const address = prompt("সম্পূর্ণ ডেলিভারি ঠিকানা লিখুন (Delivery Address):");
+    if (!address) return;
+
+    const areaInput = prompt("ডেলিভারি এরিয়া লিখুন (Dhaka বা Outside Dhaka):", "Dhaka");
+    const isInsideDhaka = areaInput && areaInput.toLowerCase().includes("dhaka") && !areaInput.toLowerCase().includes("outside");
+    const deliveryCharge = isInsideDhaka ? 70 : 120;
+
+    let itemList = "";
+    let subtotal = 0;
+
+    cart.forEach((item, index) => {
+        const lineTotal = item.price * item.qty;
+        subtotal += lineTotal;
+        itemList += `${index + 1}. ${item.name} | Size: ${item.size} | Qty: ${item.qty} = ৳${lineTotal}\n`;
+    });
+
+    const grandTotal = subtotal + deliveryCharge;
+
+    const message =
+`🛍️ *NEW JERSEY ORDER*
+-------------------------
+👤 *Name:* ${name}
+📞 *Phone:* ${phone}
+📍 *Address:* ${address}
+🚚 *Area:* ${isInsideDhaka ? "Inside Dhaka" : "Outside Dhaka"}
+
+👕 *Ordered Items:*
+${itemList}
+-------------------------
+💰 *Subtotal:* ৳${subtotal}
+🚚 *Delivery Charge:* ৳${deliveryCharge}
+💵 *Total Payable:* ৳${grandTotal}`;
+
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+}
 
         // Initial Load
         renderProducts(products);
